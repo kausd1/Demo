@@ -1,0 +1,46 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 1,
+      "content": {
+        "json": "## Inventory of Servers based on Heart Beat\n---\n\nWelcome to your new workbook.  This area will display text formatted as markdown.\n\n\nWe've included a basic analytics query to get you started. Use the `Edit` button below each section to configure it or add more sections."
+      },
+      "name": "text - 2"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "let FirewallCounts = CommonSecurityLog\r\n  | summarize FirewallComputerCount = dcount(Computer) by DeviceVendor;\r\nlet HeartbeatCounts = Heartbeat\r\n  | summarize DistinctCount = dcount(Computer) by OSName;\r\nunion (\r\n  FirewallCounts\r\n  | project Metric = DeviceVendor, Total = FirewallComputerCount, Source = \"Firewall Servers\"\r\n), (\r\n  HeartbeatCounts\r\n  | project Metric = OSName, Total = DistinctCount, Source = \"Operating System\"\r\n)",
+        "size": 0,
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "name": "query - 2"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "let FirewallCounts = CommonSecurityLog\r\n  | summarize FirewallComputerCount = dcount(Computer) by DeviceVendor;\r\nlet HeartbeatCounts = Heartbeat\r\n  | summarize DistinctCount = dcount(Computer) by OSName;\r\nunion (\r\n  FirewallCounts\r\n  | project Metric = DeviceVendor, Total = FirewallComputerCount, Source = \"Firewall Servers\"\r\n), (\r\n  HeartbeatCounts\r\n  | project Metric = OSName, Total = DistinctCount, Source = \"Operating System\"\r\n)",
+        "size": 0,
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "barchart"
+      },
+      "name": "query - 2"
+    }
+  ],
+  "fallbackResourceIds": [
+    "/subscriptions/d1d8779d-38d7-4f06-91db-9cbc8de0176f/resourcegroups/soc/providers/microsoft.operationalinsights/workspaces/cybersecuritysoc"
+  ],
+  "fromTemplateId": "sentinel-UserWorkbook",
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}
