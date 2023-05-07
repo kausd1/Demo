@@ -1,0 +1,57 @@
+{
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "workbookDisplayName": {
+      "type": "string",
+      "defaultValue": "New workbook",
+      "metadata": {
+        "description": "The friendly name for the workbook that is used in the Gallery or Saved List.  This name must be unique within a resource group."
+      }
+    },
+    "workbookType": {
+      "type": "string",
+      "defaultValue": "sentinel",
+      "metadata": {
+        "description": "The gallery that the workbook will been shown under. Supported values include workbook, tsg, etc. Usually, this is 'workbook'"
+      }
+    },
+    "workbookSourceId": {
+      "type": "string",
+      "defaultValue": "/subscriptions/d1d8779d-38d7-4f06-91db-9cbc8de0176f/resourcegroups/soc/providers/microsoft.operationalinsights/workspaces/cybersecuritysoc",
+      "metadata": {
+        "description": "The id of resource instance to which the workbook will be associated"
+      }
+    },
+    "workbookId": {
+      "type": "string",
+      "defaultValue": "[newGuid()]",
+      "metadata": {
+        "description": "The unique guid for this workbook instance"
+      }
+    }
+  },
+  "resources": [
+    {
+      "name": "[parameters('workbookId')]",
+      "type": "microsoft.insights/workbooks",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2022-04-01",
+      "dependsOn": [],
+      "kind": "shared",
+      "properties": {
+        "displayName": "[parameters('workbookDisplayName')]",
+        "serializedData": "{\"version\":\"Notebook/1.0\",\"items\":[{\"type\":1,\"content\":{\"json\":\"## Sentinel Health Custom Worbook\\n---\\n\\nWelcome to your new workbook.  This area will display text formatted as markdown.\\n\\n\\nWe've included a basic analytics query to get you started. Use the `Edit` button below each section to configure it or add more sections.\"},\"name\":\"text - 2\"},{\"type\":3,\"content\":{\"version\":\"KqlItem/1.0\",\"query\":\"let timeRangeQuery = 48h;\\r\\nlet UnhealthyCriteria = 30m;\\r\\nlet heartbeatThreshold = 5m;\\r\\nlet unhealthyThreshold = 30m;\\r\\nlet logs = \\r\\n  CommonSecurityLog\\r\\n  | where TimeGenerated > startofday(ago(timeRangeQuery))\\r\\n  | summarize LastHeartbeat = max(TimeGenerated) by Computer, DeviceVendor\\r\\n  | extend State = iff(LastHeartbeat < ago(UnhealthyCriteria), 'Unhealthy', 'Healthy')\\r\\n  | extend TimeFromNow = now() - LastHeartbeat\\r\\n  | extend [\\\"TimeAgo\\\"] = strcat(toint(TimeFromNow / 1s), ' seconds')\\r\\n  | project Computer, DeviceVendor, State, TimeFromNow, Source = 'Log';\\r\\n\\r\\nlet heartbeats =\\r\\n  Heartbeat\\r\\n  | where TimeGenerated > startofday(ago(timeRangeQuery))\\r\\n  | summarize LastHeartbeat = max(TimeGenerated) by Computer\\r\\n  | extend State = iff(LastHeartbeat < ago(heartbeatThreshold), 'Unhealthy', 'Healthy')\\r\\n  | extend TimeFromNow = now() - LastHeartbeat\\r\\n  | extend [\\\"TimeAgo\\\"] = strcat(toint(TimeFromNow / 1s), ' seconds')\\r\\n  | project Computer, DeviceVendor='', State, TimeFromNow, Source = 'Heartbeat';\\r\\n\\r\\nunion logs, heartbeats\\r\\n| summarize count() by Computer, State, Source\\r\\n| project Computer, State, Source\",\"size\":0,\"timeContext\":{\"durationMs\":86400000},\"queryType\":0,\"resourceType\":\"microsoft.operationalinsights/workspaces\"},\"name\":\"query - 3\"},{\"type\":1,\"content\":{\"json\":\"# Common Security Logs\\r\\n\"},\"name\":\"text - 2\"},{\"type\":3,\"content\":{\"version\":\"KqlItem/1.0\",\"query\":\"let timeRangeQuery = 48h;\\nlet UnhealthyCriteria = 30m;\\n  CommonSecurityLog\\n  | where TimeGenerated > startofday(ago(timeRangeQuery))\\n  | summarize LastHeartbeat = max(TimeGenerated) by Computer, DeviceVendor\\n  | extend State = iff(LastHeartbeat < ago(UnhealthyCriteria), 'Unhealthy', 'Healthy')\\n  | extend TimeFromNow = now() - LastHeartbeat\\n  | extend [\\\"TimeAgo\\\"] = strcat(toint(TimeFromNow / 1s), ' seconds')\\n  | project Computer, DeviceVendor, State, TimeFromNow, Source = 'Log'\\n| summarize count() by State,Source,Computer\\n\\n\",\"size\":0,\"exportToExcelOptions\":\"all\",\"queryType\":0,\"resourceType\":\"microsoft.operationalinsights/workspaces\",\"visualization\":\"categoricalbar\",\"chartSettings\":{\"xAxis\":\"State\",\"yAxis\":[\"count_\"]}},\"name\":\"query - 2\"},{\"type\":1,\"content\":{\"json\":\"# Hearbeat Logs\\r\\n\"},\"name\":\"text - 2 - Copy\"},{\"type\":3,\"content\":{\"version\":\"KqlItem/1.0\",\"query\":\"let timeRangeQuery = 48h;\\r\\nlet UnhealthyCriteria = 30m;\\r\\nlet heartbeatThreshold = 5m;\\r\\nlet unhealthyThreshold = 30m;\\r\\n  Heartbeat\\r\\n  | where TimeGenerated > startofday(ago(timeRangeQuery))\\r\\n  | summarize LastHeartbeat = max(TimeGenerated) by Computer\\r\\n  | extend State = iff(LastHeartbeat < ago(heartbeatThreshold), 'Unhealthy', 'Healthy')\\r\\n  | extend TimeFromNow = now() - LastHeartbeat\\r\\n  | extend [\\\"TimeAgo\\\"] = strcat(toint(TimeFromNow / 1s), ' seconds')\\r\\n  | project Computer,State\\r\\n  | summarize count() by State\",\"size\":0,\"queryType\":0,\"resourceType\":\"microsoft.operationalinsights/workspaces\",\"visualization\":\"categoricalbar\"},\"name\":\"query - 4\"}],\"isLocked\":false,\"fallbackResourceIds\":[\"/subscriptions/d1d8779d-38d7-4f06-91db-9cbc8de0176f/resourcegroups/soc/providers/microsoft.operationalinsights/workspaces/cybersecuritysoc\"],\"fromTemplateId\":\"sentinel-UserWorkbook\"}",
+        "version": "1.0",
+        "sourceId": "[parameters('workbookSourceId')]",
+        "category": "[parameters('workbookType')]"
+      }
+    }
+  ],
+  "outputs": {
+    "workbookId": {
+      "type": "string",
+      "value": "[resourceId( 'microsoft.insights/workbooks', parameters('workbookId'))]"
+    }
+  },
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
+}
